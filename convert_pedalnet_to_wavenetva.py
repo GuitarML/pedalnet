@@ -62,11 +62,12 @@ def convert(args):
             data_out["variables"].append({"layer_idx":i,
                                         "data":[str(i) for i in (sd['wavenet.input_layer.bias']).flatten().numpy().tolist()],
                                         "name":"b"})
-        # Output Layer
+        # # Linear Mix Layer
         #KAB Note: Linear mix weight/bias seemed large (20 to 60 range) and caused automute in DAW (too loud) 
         #          Tested scaling down the linear mix weight and bias by /1000, worked in DAW but not correct model 
         # TODO: Figure out why the values are so large compared to WaveNetVA, linear_mix layer differences?
         #       Note: The final hidden layer biases are always all "0.0" in the WaveNetVA models, why?
+
         elif  i == len(dilations):  
             data_out["variables"].append({"layer_idx":i,
                                         "data":[str(i) for i in (sd['wavenet.linear_mix.weight']).permute(a,b,c).flatten().numpy().tolist()], 
@@ -78,10 +79,12 @@ def convert(args):
         # Hidden Layers
         else:
             data_out["variables"].append({"layer_idx":i,
-                                    "data":[str(i) for i in sd['wavenet.convs_tanh.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist() + sd['wavenet.convs_sigm.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist()],
+                                    "data":[str(i) for i in sd['wavenet.convs_tanh.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist() +
+                                    sd['wavenet.convs_sigm.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist()], 
                                     "name":"W_conv"})
             data_out["variables"].append({"layer_idx":i,
-                                        "data":[str(i) for i in sd['wavenet.convs_tanh.' + str(i) + '.bias'].flatten().numpy().tolist() + sd['wavenet.convs_sigm.' + str(i) + '.bias'].flatten().numpy().tolist()],
+                                        "data":[str(i) for i in sd['wavenet.convs_tanh.' + str(i) + '.bias'].flatten().numpy().tolist() + 
+                                        sd['wavenet.convs_sigm.' + str(i) + '.bias'].flatten().numpy().tolist()],
                                         "name":"b_conv"})
             data_out["variables"].append({"layer_idx":i,
                                         "data":[str(i) for i in sd['wavenet.residuals.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist()],

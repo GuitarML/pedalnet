@@ -7,6 +7,31 @@ import argparse
 
 import struct
 
+def error_to_signal(y, y_pred, use_filter=1):
+    """
+    Error to signal ratio with pre-emphasis filter:
+    https://www.mdpi.com/2076-3417/10/3/766/htm
+    """
+    if use_filter == 1:
+        y, y_pred = pre_emphasis_filter(y), pre_emphasis_filter(y_pred)
+    return np.sum(np.power(y - y_pred, 2)) / (np.sum(np.power(y, 2) + 1e-10))
+
+def pre_emphasis_filter(x, coeff=0.95):
+    return np.concatenate([x, np.subtract(x, np.multiply(x, coeff))])
+
+def read_wave(wav_file):
+    # Extract Audio and framerate from Wav File
+    wav = wave.open(wav_file, "r")
+    signal = wav.readframes(-1)
+    signal = np.fromstring(signal, "Int16")
+    fs = wav.getframerate()
+
+    # Ensure mono
+    if wav.getnchannels() == 2:
+        print("[Error] Not a mono wav file: ", wav_file)
+        sys.exit(0)
+    return signal, fs
+
 def analyze_pred_vs_actual(args):
     ''' Generate plots to analyze the predicted signal vs the actual
         signal. 
@@ -24,73 +49,45 @@ def analyze_pred_vs_actual(args):
         4. Plots the spectrogram of (pred_signal - actual signal) 
              The idea here is to show problem frequencies from the model training
     '''
-    file1 = args.file1
-    file2 = args.file2
-    file3 = args.file3
+    output_wav = args.output_wav
+    pred_wav = args.pred_wav
+    input_wav = args.input_wav
     model_name = args.model_name
     show_plots = args.show_plots
 
-    # Extract Audio from Wav File1
-    spf3 = wave.open(file3, "r")
-    signal3 = spf3.readframes(-1)
-    signal3 = np.fromstring(signal3, "Int16")
-    fs3 = spf3.getframerate()
+    # Read the input wav file
+    signal3, fs3 = read_wave(input_wav)
 
-    # Ensure mono
-    if spf3.getnchannels() == 2:
-        print("Just mono files")
-        sys.exit(0)
-
-    # Extract Audio from Wav File1
-    spf = wave.open(file1, "r")
-    signal1 = spf.readframes(-1)
-    signal1 = np.fromstring(signal1, "Int16")
-    fs = spf.getframerate()
-
-    # Ensure mono
-    if spf.getnchannels() == 2:
-        print("Just mono files")
-        sys.exit(0)
+    # Read the output wav file
+    signal1, fs = read_wave(output_wav)
 
     Time = np.linspace(0, len(signal1) / fs, num=len(signal1))
-
     fig, (ax3, ax1, ax2) = plt.subplots(3, sharex=True, figsize=(13, 8))
     fig.suptitle('Predicted vs Actual Signal')
-    ax1.plot(Time, signal1, label=file1, color='red')
+    ax1.plot(Time, signal1, label=output_wav, color='red')
 
-    # Extract Audio from Wav File2
-    spf2 = wave.open(file2, "r")
-    signal2 = spf2.readframes(-1)
-    signal2 = np.fromstring(signal2, "Int16")
-    fs2 = spf2.getframerate()
-
-
-    #end test
-    # Ensure mono
-    if spf2.getnchannels() == 2:
-        print("Just mono files")
-        sys.exit(0)
+    # Read the predicted wav file
+    signal2, fs2 = read_wave(pred_wav)
 
     Time2 = np.linspace(0, len(signal2) / fs2, num=len(signal2))
-    ax1.plot(Time2, signal2, label=file2, color='green')
+    ax1.plot(Time2, signal2, label=pred_wav, color='green')
     ax1.legend(loc='upper right')
     ax1.set_xlabel("Time (s)")
     ax1.set_ylabel("Amplitude")
     ax1.set_title("Wav File Comparison")
     ax1.grid('on')
 
-
     error_list = []
     for s1, s2 in zip(signal1, signal2):
         error_list.append(abs(s2 - s1))
 
-    # Calculate error to signal ratio  TODO: Not correct calculation here, fix
-    # all_positive_signal = []
-    # for s3 in signal1:
-    #     all_positive_signal.append(float(abs(s3)))
-    # error2 = abs(sum(error_list) / sum(all_positive_signal))
-    # print("Error to Signal Ratio: ", error2*100, "%")
-
+    # Calculate error to signal ratio with pre-emphasis filter as 
+    #    used to train the model
+    e2s = error_to_signal(signal1, signal2)
+    e2s_no_filter = error_to_signal(signal1, signal2, use_filter=0)
+    print("Error to signal (with pre-emphasis filter): ", e2s)
+    print("Error to signal (no pre-emphasis filter): ", e2s_no_filter)
+    fig.suptitle('Predicted vs Actual Signal (error to signal: '+ str(round(e2s, 4))+')')
     # Plot signal difference
     signal_diff = signal2 - signal1
     ax2.plot(Time2, error_list, label="signal diff", color='blue')
@@ -101,7 +98,7 @@ def analyze_pred_vs_actual(args):
     
     # Plot the original signal
     Time3 = np.linspace(0, len(signal3) / fs3, num=len(signal3))
-    ax3.plot(Time3, signal3, label=file3, color='purple')
+    ax3.plot(Time3, signal3, label=input_wav, color='purple')
     ax3.legend(loc='upper right')
     ax3.set_xlabel("Time (s)")
     ax3.set_ylabel("Amplitude")
@@ -109,12 +106,12 @@ def analyze_pred_vs_actual(args):
     ax3.grid('on')
 
     # Save the plot
-    plt.savefig(model_name+'_signal_comparison.png',bbox_inches='tight')
+    plt.savefig(model_name+'_signal_comparison_e2s_' + str(round(e2s,4)) + '.png',bbox_inches='tight')
 
     # Create a zoomed in plot of 0.01 seconds centered at the max input signal value
     sig_temp = signal1.tolist()
     plt.axis([Time3[sig_temp.index((max(sig_temp)))]-.005, Time3[sig_temp.index((max(sig_temp)))]+0.005, min(signal2),max(signal2)])
-    plt.savefig(model_name+'_Detail_signal_comparison.png',bbox_inches='tight')
+    plt.savefig(model_name+'_Detail_signal_comparison_e2s_' +str(round(e2s,4)) + '.png',bbox_inches='tight')
 
     # Reset the axis
     plt.axis([0,Time3[-1],min(signal2),max(signal2)])
@@ -135,9 +132,9 @@ def analyze_pred_vs_actual(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file1", default="y_test.wav")
-    parser.add_argument("--file2", default="y_pred.wav")
-    parser.add_argument("--file3", default="x_test.wav")
+    parser.add_argument("--output_wav", default="y_test.wav")
+    parser.add_argument("--pred_wav", default="y_pred.wav")
+    parser.add_argument("--input_wav", default="x_test.wav")
     parser.add_argument("--model_name", default='plot')
     parser.add_argument("--show_plots", default=1)
     args = parser.parse_args()
