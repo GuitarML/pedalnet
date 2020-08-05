@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import wave
+#import wave
+from scipy.io import wavfile
 import sys
 from scipy import signal
 import argparse
@@ -21,15 +22,7 @@ def pre_emphasis_filter(x, coeff=0.95):
 
 def read_wave(wav_file):
     # Extract Audio and framerate from Wav File
-    wav = wave.open(wav_file, "r")
-    signal = wav.readframes(-1)
-    signal = np.fromstring(signal, "Int16")
-    fs = wav.getframerate()
-
-    # Ensure mono
-    if wav.getnchannels() == 2:
-        print("[Error] Not a mono wav file: ", wav_file)
-        sys.exit(0)
+    fs, signal = wavfile.read(wav_file)
     return signal, fs
 
 def analyze_pred_vs_actual(args):
