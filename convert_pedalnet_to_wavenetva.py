@@ -65,21 +65,13 @@ def convert(args):
                                         "name":"b"})
         # Hidden Layers
         else:
-            # data_out["variables"].append({"layer_idx":i,
-            #                         "data":[str(i) for i in sd['wavenet.convs_tanh.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist() +
-            #                         sd['wavenet.convs_sigm.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist()], 
-            #                         "name":"W_conv"})
-            # data_out["variables"].append({"layer_idx":i,
-            #                             "data":[str(i) for i in sd['wavenet.convs_tanh.' + str(i) + '.bias'].flatten().numpy().tolist() + 
-            #                             sd['wavenet.convs_sigm.' + str(i) + '.bias'].flatten().numpy().tolist()],
-            #                             "name":"b_conv"})
             data_out["variables"].append({"layer_idx":i,
-                                    "data":[str(i) for i in sd['wavenet.convs_sigm.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist() +
-                                    sd['wavenet.convs_tanh.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist()], 
+                                    "data":[str(i) for i in sd['wavenet.convs_tanh.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist() +
+                                    sd['wavenet.convs_sigm.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist()], 
                                     "name":"W_conv"})
             data_out["variables"].append({"layer_idx":i,
-                                        "data":[str(i) for i in sd['wavenet.convs_sigm.' + str(i) + '.bias'].flatten().numpy().tolist() + 
-                                        sd['wavenet.convs_tanh.' + str(i) + '.bias'].flatten().numpy().tolist()],
+                                        "data":[str(i) for i in sd['wavenet.convs_tanh.' + str(i) + '.bias'].flatten().numpy().tolist() + 
+                                        sd['wavenet.convs_sigm.' + str(i) + '.bias'].flatten().numpy().tolist()],
                                         "name":"b_conv"})
             data_out["variables"].append({"layer_idx":i,
                                         "data":[str(i) for i in sd['wavenet.residuals.' + str(i) + '.weight'].permute(a,b,c).flatten().numpy().tolist()],
