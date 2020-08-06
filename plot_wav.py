@@ -30,15 +30,15 @@ def analyze_pred_vs_actual(args):
         signal. 
         
         Inputs: 
-            file1 : The actual signal, by default will use y_test.wav from the test.py output
-            file2 : The predicted signal, by default will use y_pred.wav from the test.py output
+            output_wav : The actual signal, by default will use y_test.wav from the test.py output
+            pred_wav : The predicted signal, by default will use y_pred.wav from the test.py output
+            input_wav : The pre effect signal, by default will use x_test.wav from the test.py output
             model_name : Used to add the model name to the plot .png filename
             show_plots : Default is 1 to show plots, 0 to only generate .png files and suppress plots
 
         1. Plots the two signals
-        2. Calculates Error to signal ratio (for overall model evaluation):
-           sum(pred_signal - actual_signal)) / sum(actual_signal)  
-        3. Plots the absolute value of pred_signal - actual_signal  (to visualize error over time)
+        2. Calculates Error to signal ratio the same way Pedalnet evauluates the model for training
+        3. Plots the absolute value of pred_signal - actual_signal  (to visualize abs error over time)
         4. Plots the spectrogram of (pred_signal - actual signal) 
              The idea here is to show problem frequencies from the model training
     '''
