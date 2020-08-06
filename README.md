@@ -1,3 +1,11 @@
+Note: This modified version of teddykoker/pedalnet is IN WORK. 
+       Goals are to create a plugin to use in a DAW from the trained models,
+       either by converting the model to the the WaveNetVA repo format,
+       or by generating a deployable Pytorch model from Pedalnet. 
+       Also added plot_wav.py, which is intended to analyze the wav files
+       generated from test.py. 
+
+
 # PedalNet
 
 Re-creation of model from [Real-Time Guitar Amplifier Emulation with Deep
