@@ -5,10 +5,8 @@ from torch.utils.data import TensorDataset, DataLoader
 
 import pytorch_lightning as pl
 import pickle
+import argparse
 
-# Current changes to the original PedalNet model to match WaveNetVA include:
-#   1. Added CausalConv1d() to use causal padding
-#   2. Added an input layer, which is a Conv1d(in_channls=1, out_channels=num_channels, kernel_size=1)
 
 class CausalConv1d(torch.nn.Conv1d):
     def __init__(self,
@@ -36,22 +34,20 @@ class CausalConv1d(torch.nn.Conv1d):
         if self.__padding != 0:
             return result[:, :, :-self.__padding]
         return result
+        
 
 def _conv_stack(dilations, in_channels, out_channels, kernel_size):
     """
     Create stack of dilated convolutional layers, outlined in WaveNet paper:
     https://arxiv.org/pdf/1609.03499.pdf
     """
-    return nn.ModuleList([
-            #nn.Conv1d(
+    return nn.ModuleList(
+        [
             CausalConv1d(
-                #in_channels=(in_channels if i == 0 else out_channels),
-                in_channels=out_channels, 
+                in_channels=in_channels,
                 out_channels=out_channels,
                 dilation=d,
                 kernel_size=kernel_size,
-
-                #bias=(False if i == len(dilations) and kernel_size==1 else True)  # Testing setting no learnable bias on final hidden layer, wavenetva biases on this layer are always 0
             )
             for i, d in enumerate(dilations)
         ]
@@ -59,44 +55,48 @@ def _conv_stack(dilations, in_channels, out_channels, kernel_size):
 
 
 class WaveNet(nn.Module):
-    def __init__(self, num_channels, dilation_depth, num_repeat, kernel_size):
+    def __init__(self, num_channels, dilation_depth, num_repeat, kernel_size=2):
         super(WaveNet, self).__init__()
         dilations = [2 ** d for d in range(dilation_depth)] * num_repeat
-        self.convs_sigm = _conv_stack(dilations, 1, num_channels, kernel_size)
-        self.convs_tanh = _conv_stack(dilations, 1, num_channels, kernel_size)
+        internal_channels = int(num_channels*2)
+        self.hidden = _conv_stack(dilations, num_channels, internal_channels, kernel_size)
         self.residuals = _conv_stack(dilations, num_channels, num_channels, 1)
-
-        self.input_layer = CausalConv1d( #nn.Conv1d(
+        self.input_layer = CausalConv1d(
             in_channels=1,
             out_channels=num_channels,
             kernel_size=1,
         )
 
-        self.linear_mix = CausalConv1d( #nn.Conv1d(
+        self.linear_mix = nn.Conv1d(
             in_channels=num_channels * dilation_depth * num_repeat,
             out_channels=1,
-            kernel_size=1, 
+            kernel_size=1,
         )
+
 
     def forward(self, x):
         out = x
         skips = []
-
         out = self.input_layer(out)
 
-        for conv_sigm, conv_tanh, residual in zip(
-            self.convs_sigm, self.convs_tanh, self.residuals
+        for hidden, residual in zip(
+            self.hidden, self.residuals
         ):
             x = out
-            out_sigm, out_tanh = conv_sigm(x), conv_tanh(x)
+            out_hidden = hidden(x)
+
             # gated activation
-            out = torch.tanh(out_tanh) * torch.sigmoid(out_sigm)
-            skips.append(out)  #Skips, appending output from each layer
+            #   split (32,16,3) into two (16,16,3) for tanh and sigm calculations
+            out_hidden_split = torch.split(out_hidden, 16, dim=1)  
+            out = torch.tanh(out_hidden_split[0]) * torch.sigmoid(out_hidden_split[1])
+
+            skips.append(out)
+
             out = residual(out)
-            out = out + x[:, :, -out.size(2) :]  # fit input with layer output, (input added to layer output)
+            out = out + x[:, :, -out.size(2) :]  
 
         # modified "postprocess" step:
-        out = torch.cat([s[:, :, -out.size(2) :] for s in skips], dim=1) 
+        out = torch.cat([s[:, :, -out.size(2) :] for s in skips], dim=1)
         out = self.linear_mix(out)
         return out
 

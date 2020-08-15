@@ -1,10 +1,28 @@
-Note: This modified version of teddykoker/pedalnet is IN WORK. 
-       Goals are to create a plugin to use in a DAW from the trained models,
-       either by converting the model to the the WaveNetVA repo format,
-       or by generating a deployable Pytorch model from Pedalnet. 
-       Also added plot_wav.py, which is intended to analyze the wav files
-       generated from test.py. 
+---------------------------------------------------------------------------
+This modified version of PedalNet is meant to be used in 
+conjuction with the WaveNetVA code repository. You can train a model using 
+this repo, then convert it to a .json model that can be loaded into the 
+WaveNetVA plugin. 
 
+Usage:
+
+	python convert_pedalnet_to_wavnetva.py --model=your_trained_model.ckpt
+
+Generates a file named "converted_model.json" that can be loaded into the
+WaveNetVa plugin.
+
+You can also use "plot_wav.py" to evaluate the trained PedalNet model. By 
+default, this will analyze the three .wav files from the test.py output. It 
+will output analysis plots and calculate the error to signal ratio. 
+
+Usage (after running "python test.py --model=your_model.ckpt"):
+
+	python plot_wav.py
+
+Note: The training wav files in data/ are float32 format, as opposed to int16,
+and the scripts in this repo are modified to use float32.
+
+---------------------------------------------------------------------------
 
 # PedalNet
 
