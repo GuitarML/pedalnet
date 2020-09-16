@@ -1,15 +1,22 @@
 ---------------------------------------------------------------------------
 This modified version of PedalNet is meant to be used in 
-conjuction with the WaveNetVA code repository. You can train a model using 
-this repo, then convert it to a .json model that can be loaded into the 
-WaveNetVA plugin. 
+conjuction with the SmartGuitarPedal, SmartGuitarAmp, and WaveNetVA code
+repositories. You can train a model using this repo, then convert it 
+to a .json model that can be loaded into the VST plugin. 
+
+The following repositories are compatible with the converted .json model,
+for use with real time guitar playing through a DAW plugin or stand alone app:
+
+https://github.com/keyth72/SmartGuitarPedal
+https://github.com/keyth72/SmartGuitarAmp
+https://github.com/damskaggep/WaveNetVA
+
 
 Usage:
 
 	python convert_pedalnet_to_wavnetva.py --model=your_trained_model.ckpt
 
-Generates a file named "converted_model.json" that can be loaded into the
-WaveNetVa plugin.
+Generates a file named "converted_model.json" that can be loaded into the VST plugin.
 
 You can also use "plot_wav.py" to evaluate the trained PedalNet model. By 
 default, this will analyze the three .wav files from the test.py output. It 
@@ -21,6 +28,29 @@ Usage (after running "python test.py --model=your_model.ckpt"):
 
 Note: The training wav files in data/ are float32 format, as opposed to int16,
 and the scripts in this repo are modified to use float32.
+
+Differences from the original PedalNet (to make compatible with WaveNet plugin):
+1. Uses a custom Causal Padding mode not available in PyTorch.
+2. Uses a single conv1d layer for both sigm and tanh calculations, instead of 
+   two separate layers.
+3. Requires float32 .wav files for training (instead of int16).
+
+Helpful tips on training models:
+1. Wav files should be 3 - 4 minutes long, and contain a variety of
+   chords, individual notes, and playing techniques to get a full spectrum
+   of data for the model to "learn" from.
+2. Use of a buffer splitter was used with pedals to obtain a pure guitar signal
+   and post effect signal.
+3. Obtaining sample data from an amp can be done by splitting off the original 
+   signal, with the post amp signal coming from a microphone (I used a SM57).
+   Keep in mind that this captures the dynamic response of the mic and cabinet.
+   In the original research the sound was captured directly from within the amp
+   circuit to have a "pure" amp signal.
+4. Generally speaking, the more distorted the effect/amp, the more difficult it
+   is to train. Experiment with different hyperparameters for each target 
+   hardeware. I found that a model with only 5 channels was able to sufficiently
+   model some effects, and this reduces the model size and allows the plugin 
+   to use less processing power.
 
 ---------------------------------------------------------------------------
 
