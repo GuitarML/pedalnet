@@ -28,8 +28,6 @@ Usage (after running "python test.py --model=your_model.ckpt"):
 
 	python plot_wav.py
 
-Note: The training wav files in data/ are float32 format, as opposed to int16,
-and the scripts in this repo are modified to use float32.
 
 Differences from the original PedalNet (to make compatible with WaveNet plugin):
 1. Uses a custom Causal Padding mode not available in PyTorch.
@@ -41,7 +39,7 @@ Helpful tips on training models:
 1. Wav files should be 3 - 4 minutes long, and contain a variety of
    chords, individual notes, and playing techniques to get a full spectrum
    of data for the model to "learn" from.
-2. Use of a buffer splitter was used with pedals to obtain a pure guitar signal
+2. A buffer splitter was used with pedals to obtain a pure guitar signal
    and post effect signal.
 3. Obtaining sample data from an amp can be done by splitting off the original 
    signal, with the post amp signal coming from a microphone (I used a SM57).
