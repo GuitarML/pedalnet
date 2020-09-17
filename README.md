@@ -33,7 +33,8 @@ Differences from the original PedalNet (to make compatible with WaveNet plugin):
 1. Uses a custom Causal Padding mode not available in PyTorch.
 2. Uses a single conv1d layer for both sigm and tanh calculations, instead of 
    two separate layers.
-3. Requires float32 .wav files for training (instead of int16).
+3. Adds a conv1d input layer.
+4. Requires float32 .wav files for training (instead of int16).
 
 Helpful tips on training models:
 1. Wav files should be 3 - 4 minutes long, and contain a variety of
@@ -48,7 +49,7 @@ Helpful tips on training models:
    circuit to have a "pure" amp signal.
 4. Generally speaking, the more distorted the effect/amp, the more difficult it
    is to train. Experiment with different hyperparameters for each target 
-   hardeware. I found that a model with only 5 channels was able to sufficiently
+   hardware. I found that a model with only 5 channels was able to sufficiently
    model some effects, and this reduces the model size and allows the plugin 
    to use less processing power.
 
