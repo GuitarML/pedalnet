@@ -52,6 +52,11 @@ Helpful tips on training models:
    hardware. I found that a model with only 5 channels was able to sufficiently
    model some effects, and this reduces the model size and allows the plugin 
    to use less processing power.
+5. When recording samples, try to maximize the volume levels without clipping.
+   The levels you train the model at will be reproduced by the plugin. Also try 
+   to make the pre effect and post effect wav samples equal in volume levels. 
+   Even though the actual amp or effect may raise the level significantly, this isn't 
+   necessarily desirable in the end plugin.
 
 ---------------------------------------------------------------------------
 
