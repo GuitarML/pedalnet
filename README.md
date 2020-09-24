@@ -1,8 +1,8 @@
 ---------------------------------------------------------------------------
-This modified version of PedalNet is meant to be used in 
-conjuction with the SmartGuitarPedal, SmartGuitarAmp, and WaveNetVA code
-repositories. You can train a model using this repo, then convert it 
-to a .json model that can be loaded into the VST plugin. 
+This modified version of PedalNet is meant to be used with the 
+SmartGuitarPedal, SmartGuitarAmp, and WaveNetVA code repositories. 
+You can train a model using this repo, then convert it to a .json 
+model that can be loaded into the VST plugin. 
 
 The following repositories are compatible with the converted .json model,
 for use with real time guitar playing through a DAW plugin or stand alone app:
