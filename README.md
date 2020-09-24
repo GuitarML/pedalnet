@@ -57,6 +57,10 @@ Helpful tips on training models:
    to make the pre effect and post effect wav samples equal in volume levels. 
    Even though the actual amp or effect may raise the level significantly, this isn't 
    necessarily desirable in the end plugin.
+   
+   
+ Note: Added an experimental Google Colab notebook to train pedalnet models on TPU's.
+       Upload "colab_TPU_training.ipynb" in Google Colab to use.
 
 ---------------------------------------------------------------------------
 
