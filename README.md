@@ -1,3 +1,7 @@
+*****************
+UPDATE (9/25/20): This fork has been moved to the following repository: https://github.com/keyth72/PedalNetRT
+*****************
+
 # PedalNet (Real Time)
 This modified version of PedalNet is meant to be used with the 
 SmartGuitarPedal, SmartGuitarAmp, and WaveNetVA plugins. 
