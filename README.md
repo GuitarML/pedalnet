@@ -1,6 +1,6 @@
----------------------------------------------------------------------------
+**PedalNet (Real Time)**:-----------------------------------------------------
 This modified version of PedalNet is meant to be used with the 
-SmartGuitarPedal, SmartGuitarAmp, and WaveNetVA code repositories. 
+SmartGuitarPedal, SmartGuitarAmp, and WaveNetVA plugins. 
 You can train a model using this repo, then convert it to a .json 
 model that can be loaded into the VST plugin. 
 
@@ -13,13 +13,14 @@ https://github.com/keyth72/SmartGuitarAmp
 
 https://github.com/damskaggep/WaveNetVA
 
-
+**Model Conversion**:
 Usage:
 
 	python convert_pedalnet_to_wavnetva.py --model=your_trained_model.ckpt
 
 Generates a file named "converted_model.json" that can be loaded into the VST plugin.
 
+**Analysis**:
 You can also use "plot_wav.py" to evaluate the trained PedalNet model. By 
 default, this will analyze the three .wav files from the test.py output. It 
 will output analysis plots and calculate the error to signal ratio. 
@@ -30,6 +31,7 @@ Usage (after running "python test.py --model=your_model.ckpt"):
 
 ![app](https://github.com/keyth72/pedalnet/blob/master/figures/example_plot.png)
 
+**Info**:
 Differences from the original PedalNet (to make compatible with WaveNet plugin):
 1. Uses a custom Causal Padding mode not available in PyTorch.
 2. Uses a single conv1d layer for both sigm and tanh calculations, instead of 
