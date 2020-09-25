@@ -57,7 +57,7 @@ Creates files `y_test.wav`, `y_pred.wav`, and `x_test.wav`, for the ground truth
 output, predicted output, and input signal respectively.
 
 
-## Model Conversion
+**Model Conversion**:
 
 The .ckpt model must be converted to a .json model to run in the plugin.
 Usage:
@@ -66,7 +66,7 @@ Usage:
 
 Generates a file named "converted_model.json" that can be loaded into the VST plugin.
 
-## Analysis
+**Analysis**:
 You can also use "plot_wav.py" to evaluate the trained PedalNet model. By 
 default, this will analyze the three .wav files from the test.py output. It 
 will output analysis plots and calculate the error to signal ratio. 
