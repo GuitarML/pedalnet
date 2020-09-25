@@ -67,6 +67,7 @@ Usage:
 Generates a file named "converted_model.json" that can be loaded into the VST plugin.
 
 **Analysis**:
+
 You can also use "plot_wav.py" to evaluate the trained PedalNet model. By 
 default, this will analyze the three .wav files from the test.py output. It 
 will output analysis plots and calculate the error to signal ratio. 
