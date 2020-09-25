@@ -28,6 +28,7 @@ Usage (after running "python test.py --model=your_model.ckpt"):
 
 	python plot_wav.py
 
+![app](https://github.com/keyth72/pedalnet/blob/master/figures/example_plot.png)
 
 Differences from the original PedalNet (to make compatible with WaveNet plugin):
 1. Uses a custom Causal Padding mode not available in PyTorch.
