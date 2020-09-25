@@ -19,7 +19,7 @@ Learning](https://www.mdpi.com/2076-3417/10/3/766/htm)
 
 ## Data
 
-`data/ts9_test1_in_FP32.wav` - Playing from a Fender Telecaster, bridge pickup, max tone and volume
+`data/ts9_test1_in_FP32.wav` - Playing from a Fender Telecaster, bridge pickup, max tone and volume<br>
 `data/ts9_test1_out_FP32.wav` - Split with JHS Buffer Splitter to Ibanez TS9 Tube Screamer 
 (max drive, mid tone and volume).<br>
 `models/ts9_epoch=1362.ckpt` - Pretrained model weights
